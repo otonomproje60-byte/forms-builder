@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms Builder - Lightweight Form Endpoint</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 40px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card { background: white; border-radius: 12px; padding: 40px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        h1 { margin: 0 0 16px; color: #333; font-size: 32px; }
+        .subtitle { color: #666; margin-bottom: 32px; font-size: 18px; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 32px; }
+        .feature { padding: 20px; background: #f8f9fa; border-radius: 8px; }
+        .feature h3 { margin: 0 0 8px; color: #333; font-size: 16px; }
+        .feature p { margin: 0; color: #666; font-size: 14px; }
+        .endpoints { background: #1e1e1e; color: #d4d4d4; border-radius: 8px; padding: 24px; font-family: 'Monaco', 'Menlo', monospace; font-size: 14px; overflow-x: auto; }
+        .endpoint { margin: 8px 0; }
+        .method { color: #4ec9b0; font-weight: bold; }
+        .method.post { color: #ce9178; }
+        .method.get { color: #4ec9b0; }
+        .path { color: #dcdcaa; }
+        .desc { color: #6a9955; margin-left: 12px; }
+        .footer { margin-top: 32px; text-align: center; color: #888; font-size: 14px; }
+        .footer a { color: #667eea; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; background: #e8f5e9; color: #2e7d32; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <span class="badge">v{{ version }}</span>
+            <h1>Forms Builder</h1>
+            <p class="subtitle">Lightweight Python form endpoint/builder — an OhMyForm alternative for self-hosted form submissions with email/webhook notifications.</p>
+            
+            <div class="features">
+                <div class="feature">
+                    <h3>🚀 Simple API</h3>
+                    <p>RESTful endpoints for creating forms and receiving submissions. No complex setup required.</p>
+                </div>
+                <div class="feature">
+                    <h3>📧 Email Notifications</h3>
+                    <p>Get notified via SMTP when a form is submitted. Customizable subject and recipient.</p>
+                </div>
+                <div class="feature">
+                    <h3>🔗 Webhook Support</h3>
+                    <p>Send submissions to any HTTP endpoint with HMAC signature verification.</p>
+                </div>
+                <div class="feature">
+                    <h3>🛡️ Spam Protection</h3>
+                    <p>Built-in honeypot field, pattern detection, and rate limiting.</p>
+                </div>
+                <div class="feature">
+                    <h3>📱 Embeddable Forms</h3>
+                    <p>Drop-in HTML/JS snippets to embed forms anywhere — static sites, SPAs, anywhere.</p>
+                </div>
+                <div class="feature">
+                    <h3>🐳 Docker Ready</h3>
+                    <p>Single container deployment with SQLite persistence. Zero external dependencies.</p>
+                </div>
+            </div>
+
+            <h3>API Endpoints</h3>
+            <div class="endpoints">
+                <div class="endpoint"><span class="method post">POST</span> <span class="path">/api/forms</span> <span class="desc"># Create a new form</span></div>
+                <div class="endpoint"><span class="method get">GET</span> <span class="path">/api/forms</span> <span class="desc"># List all forms</span></div>
+                <div class="endpoint"><span class="method get">GET</span> <span class="path">/api/forms/{id}</span> <span class="desc"># Get form details</span></div>
+                <div class="endpoint"><span class="method post">POST</span> <span class="path">/api/forms/{id}/submit</span> <span class="desc"># Submit form data (public)</span></div>
+                <div class="endpoint"><span class="method get">GET</span> <span class="path">/api/forms/{id}/submissions</span> <span class="desc"># List submissions (admin)</span></div>
+                <div class="endpoint"><span class="method get">GET</span> <span class="path">/embed/{id}</span> <span class="desc"># Embeddable HTML form</span></div>
+                <div class="endpoint"><span class="method get">GET</span> <span class="path">/embed/{id}.js</span> <span class="desc"># Embeddable JS snippet</span></div>
+                <div class="endpoint"><span class="method get">GET</span> <span class="path">/healthz</span> <span class="desc"># Health check</span></div>
+            </div>
+
+            <div class="footer">
+                <p>Built with FastAPI + SQLite • <a href="https://github.com/otonomproje60-byte/forms-builder" target="_blank">GitHub</a> • <a href="/docs" target="_blank">API Docs</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
