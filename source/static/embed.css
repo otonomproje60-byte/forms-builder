@@ -1,0 +1,188 @@
+/* Forms Builder Embeddable Widget Styles */
+.forms-builder-widget {
+  --fb-primary: #3498db;
+  --fb-primary-hover: #2980b9;
+  --fb-success: #27ae60;
+  --fb-error: #e74c3c;
+  --fb-bg: #ffffff;
+  --fb-border: #ddd;
+  --fb-text: #333;
+  --fb-muted: #6b7280;
+  --fb-radius: 8px;
+  --fb-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  --fb-focus: rgba(52,152,219,0.2);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
+  max-width: 600px;
+  margin: 0 auto;
+  background: var(--fb-bg);
+  padding: 30px;
+  border-radius: var(--fb-radius);
+  box-shadow: var(--fb-shadow);
+}
+
+.forms-builder-widget * {
+  box-sizing: border-box;
+}
+
+.forms-builder-widget .form-title {
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: var(--fb-text);
+}
+
+.forms-builder-widget .form-description {
+  color: var(--fb-muted);
+  margin-bottom: 24px;
+}
+
+.forms-builder-widget .form-group {
+  margin-bottom: 20px;
+}
+
+.forms-builder-widget label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: var(--fb-text);
+}
+
+.forms-builder-widget .required::after {
+  content: " *";
+  color: var(--fb-error);
+}
+
+.forms-builder-widget input[type="text"],
+.forms-builder-widget input[type="email"],
+.forms-builder-widget input[type="password"],
+.forms-builder-widget input[type="tel"],
+.forms-builder-widget input[type="url"],
+.forms-builder-widget input[type="number"],
+.forms-builder-widget input[type="date"],
+.forms-builder-widget textarea,
+.forms-builder-widget select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--fb-border);
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: inherit;
+  background: var(--fb-bg);
+  color: var(--fb-text);
+}
+
+.forms-builder-widget input:focus,
+.forms-builder-widget textarea:focus,
+.forms-builder-widget select:focus {
+  outline: none;
+  border-color: var(--fb-primary);
+  box-shadow: 0 0 0 3px var(--fb-focus);
+}
+
+.forms-builder-widget textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.forms-builder-widget .checkbox-group,
+.forms-builder-widget .radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.forms-builder-widget .checkbox-item,
+.forms-builder-widget .radio-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.forms-builder-widget .checkbox-item input,
+.forms-builder-widget .radio-item input {
+  width: auto;
+  accent-color: var(--fb-primary);
+}
+
+.forms-builder-widget .help-text {
+  font-size: 13px;
+  color: var(--fb-muted);
+  margin-top: 4px;
+}
+
+.forms-builder-widget .error-message {
+  color: var(--fb-error);
+  font-size: 13px;
+  margin-top: 4px;
+  display: none;
+}
+
+.forms-builder-widget .form-group.error .error-message {
+  display: block;
+}
+
+.forms-builder-widget .form-group.error input,
+.forms-builder-widget .form-group.error textarea,
+.forms-builder-widget .form-group.error select {
+  border-color: var(--fb-error);
+}
+
+.forms-builder-widget button[type="submit"] {
+  width: 100%;
+  padding: 14px;
+  background: var(--fb-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.forms-builder-widget button[type="submit"]:hover:not(:disabled) {
+  background: var(--fb-primary-hover);
+}
+
+.forms-builder-widget button[type="submit"]:disabled {
+  background: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.forms-builder-widget .forms-builder-honeypot {
+  display: none !important;
+}
+
+.forms-builder-widget .forms-builder-success {
+  text-align: center;
+  padding: 20px;
+}
+
+.forms-builder-widget .forms-builder-success h2 {
+  color: var(--fb-success);
+  margin: 0 0 10px;
+  font-size: 24px;
+}
+
+.forms-builder-widget .forms-builder-success p {
+  color: var(--fb-muted);
+  margin: 0;
+}
+
+.forms-builder-widget .forms-builder-loading {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: white;
+  border-radius: 50%;
+  animation: fb-spin 0.8s linear infinite;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@keyframes fb-spin {
+  to { transform: rotate(360deg); }
+}

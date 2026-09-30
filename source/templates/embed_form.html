@@ -4,36 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ form.name }} - Forms Builder</title>
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
-        .form-container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .form-title { margin: 0 0 8px; font-size: 24px; color: #333; }
-        .form-description { color: #666; margin-bottom: 24px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 6px; font-weight: 500; color: #333; }
-        .required::after { content: " *"; color: #e74c3c; }
-        input[type="text"], input[type="email"], textarea, select {
-            width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px;
-        }
-        input:focus, textarea:focus, select:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 3px rgba(52,152,219,0.2); }
-        textarea { min-height: 100px; resize: vertical; }
-        .checkbox-group { display: flex; flex-wrap: wrap; gap: 12px; }
-        .checkbox-item { display: flex; align-items: center; gap: 8px; }
-        .checkbox-item input { width: auto; }
-        .help-text { font-size: 13px; color: #888; margin-top: 4px; }
-        .error-message { color: #e74c3c; font-size: 13px; margin-top: 4px; display: none; }
-        button[type="submit"] {
-            width: 100%; padding: 14px; background: #3498db; color: white; border: none;
-            border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer;
-        }
-        button[type="submit"]:hover { background: #2980b9; }
-        button[type="submit"]:disabled { background: #bdc3c7; cursor: not-allowed; }
-        .forms-builder-honeypot { display: none !important; }
-    </style>
+    <link rel="stylesheet" href="{{ api_base }}/static/embed.css">
 </head>
 <body>
-    <div class="form-container">
+    <div class="forms-builder-widget">
         <h1 class="form-title">{{ form.name }}</h1>
         {% if form.description %}
         <p class="form-description">{{ form.description }}</p>
@@ -65,9 +39,9 @@
                 </div>
                 
                 {% elif field.type == 'radio' %}
-                <div class="checkbox-group">
+                <div class="radio-group">
                     {% for option in field.options or [] %}
-                    <label class="checkbox-item">
+                    <label class="radio-item">
                         <input type="radio" name="{{ field.name }}" value="{{ option }}" {% if field.required and loop.first %}required{% endif %}> {{ option }}
                     </label>
                     {% endfor %}
@@ -98,61 +72,20 @@
             </div>
             {% endif %}
             
-            <button type="submit" id="submit-btn">Submit</button>
+            <button type="submit">Submit</button>
         </form>
     </div>
 
+    <script src="{{ api_base }}/static/embed.js"></script>
     <script>
-        document.getElementById('forms-builder-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const form = this;
-            const submitBtn = document.getElementById('submit-btn');
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Clear previous errors
-            form.querySelectorAll('.error-message').forEach(el => el.textContent = '');
-            form.querySelectorAll('.form-group').forEach(el => el.classList.remove('error'));
-            
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
-            try {
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: data })
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok && result.id) {
-                    form.innerHTML = '<div style="text-align: center; padding: 20px;"><h2 style="color: #27ae60;">✓ Thank you!</h2><p>Your submission has been received.</p></div>';
-                } else {
-                    // Show validation errors
-                    if (result.detail) {
-                        if (typeof result.detail === 'string') {
-                            alert('Error: ' + result.detail);
-                        } else if (result.detail.errors) {
-                            result.detail.errors.forEach(err => {
-                                const field = form.querySelector('[data-field="' + err.loc[1] + '"]');
-                                if (field) {
-                                    field.classList.add('error');
-                                    field.querySelector('.error-message').textContent = err.msg;
-                                }
-                            });
-                        }
-                    } else {
-                        alert('Submission failed. Please try again.');
-                    }
-                }
-            } catch (err) {
-                alert('Network error. Please try again.');
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit';
+        // Initialize the form with the API base
+        var container = document.querySelector('.forms-builder-widget');
+        if (container) {
+            var form = container.querySelector('form');
+            if (form) {
+                // The embed.js will handle form submission
             }
-        });
+        }
     </script>
 </body>
 </html>
