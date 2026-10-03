@@ -40,3 +40,17 @@ Lightweight Python form endpoint/builder - OhMyForm alternative. FastAPI + SQLit
 - Write tests in tests/ directory
 - Consider adding email/webhook notification templates
 - Monitor for production readiness
+
+## Cycle 670 Updates
+- **Tests created**: 11 passing tests covering health endpoint, static files (embed.css, embed.js), embed endpoints (404 handling), API endpoints (list, get, submit, submissions), and root endpoint
+- **Test location**: `/opt/autonomous-factory/projects/forms-builder/tests/test_main.py`
+- **Static assets created**: embed.css and embed.js in source/static/ for embeddable widget support
+- **All tests passing**: 11/11 tests pass with pytest
+
+## Cycle 713 Updates
+- **Growth phase initiated**: Created growth assets for organic distribution
+  - Comprehensive README.md with comparison tables, embed examples, API documentation
+  - SEO/comparison content: "Forms Builder: The OhMyForm Alternative" page
+  - Community outreach drafts for r/selfhosted, r/python, HN Show HN
+- **Market validation evidence strengthened**: OhMyForm archived Oct 2024 (3k+ stars), Formbricks ~300MB RAM/3+ containers/AGPL, zero active Python alternatives
+- **Next**: Human posts outreach drafts → monitor for stars/deployments/feedback → iterate based on signals
