@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forms Builder - {% if form %}Edit{% else %}Create{% endif %} Form</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; min-height: 100vh; }
+        .container { max-width: 900px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+        h1 { margin: 0; color: #333; font-size: 28px; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary { background: white; color: #333; border: 1px solid #ddd; }
+        .btn-secondary:hover { background: #f5f5f5; }
+        .btn-danger { background: #fee2e2; color: #dc2626; }
+        .btn-danger:hover { background: #fecaca; }
+        
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 32px; margin-bottom: 24px; }
+        .card-title { margin: 0 0 24px; color: #333; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 16px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; color: #333; font-size: 14px; }
+        input[type="text"], input[type="email"], input[type="number"], textarea, select {
+            width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; font-family: inherit;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="number"]:focus, textarea:focus, select:focus {
+            outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+        textarea { min-height: 100px; resize: vertical; }
+        .checkbox-label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .checkbox-label input[type="checkbox"] { width: 18px; height: 18px; accent-color: #667eea; }
+        .help-text { font-size: 12px; color: #888; margin-top: 4px; }
+        
+        .fields-section { margin-top: 24px; }
+        .field-row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 12px; flex-wrap: wrap; }
+        .field-row > * { flex: 1; min-width: 150px; }
+        .field-row .field-name { flex: 2; }
+        .field-row .field-type { flex: 1; }
+        .field-row .field-label { flex: 2; }
+        .field-row .field-required { flex: 0 0 80px; }
+        .field-row .field-remove { flex: 0 0 50px; }
+        
+        .field-options { margin-top: 8px; padding: 12px; background: #fafafa; border-radius: 6px; display: none; }
+        .field-options.visible { display: block; }
+        .field-options input { width: 100%; }
+        
+        .add-field-btn { margin-top: 16px; }
+        .form-actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 32px; padding-top: 24px; border-top: 1px solid #eee; }
+        
+        .flash { padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .flash-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .flash-error { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+        
+        .embed-info { background: #f0f4ff; border: 1px solid #d6e4ff; border-radius: 8px; padding: 16px; margin-top: 24px; }
+        .embed-info h4 { margin: 0 0 12px; color: #333; }
+        .embed-info code { background: white; padding: 4px 8px; border-radius: 4px; font-size: 13px; display: block; margin: 8px 0; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{% if form %}Edit Form{% else %}Create Form{% endif %}</h1>
+            <a href="/forms" class="btn btn-secondary">← Back to Forms</a>
+        </div>
+        
+        {% if flash %}
+        <div class="flash flash-{{ flash.type }}">{{ flash.message }}</div>
+        {% endif %}
+        
+        <form method="POST" action="{% if form %}/forms/{{ form.id }}/edit{% else %}/forms/new{% endif %}">
+            <!-- Basic Info -->
+            <div class="card">
+                <h2 class="card-title">Basic Information</h2>
+                <div class="form-group">
+                    <label for="name">Form Name *</label>
+                    <input type="text" id="name" name="name" required value="{{ form.name if form else '' }}" placeholder="e.g., Contact Form">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" placeholder="Optional description">{{ form.description if form else '' }}</textarea>
+                </div>
+            </div>
+            
+            <!-- Form Fields -->
+            <div class="card">
+                <h2 class="card-title">Form Fields</h2>
+                <p style="color: #666; margin-bottom: 16px;">Define the fields for your form. At least one field is required.</p>
+                
+                <div id="fields-container">
+                    {% if form and form.fields %}
+                        {% for field in form.fields %}
+                        <div class="field-row" data-field-index="{{ loop.index0 }}">
+                            <input type="hidden" name="fields[{{ loop.index0 }}][name]" value="{{ field.name }}">
+                            <div class="form-group field-name">
+                                <label>Field Name *</label>
+                                <input type="text" name="fields[{{ loop.index0 }}][name]" value="{{ field.name }}" required readonly style="background: #f5f5f5;">
+                                <div class="help-text">Field name cannot be changed after creation</div>
+                            </div>
+                            <div class="form-group field-type">
+                                <label>Type *</label>
+                                <select name="fields[{{ loop.index0 }}][type]" onchange="toggleOptions(this, {{ loop.index0 }})" required>
+                                    <option value="text" {% if field.type == 'text' %}selected{% endif %}>Text</option>
+                                    <option value="email" {% if field.type == 'email' %}selected{% endif %}>Email</option>
+                                    <option value="textarea" {% if field.type == 'textarea' %}selected{% endif %}>Textarea</option>
+                                    <option value="select" {% if field.type == 'select' %}selected{% endif %}>Select (Dropdown)</option>
+                                    <option value="checkbox" {% if field.type == 'checkbox' %}selected{% endif %}>Checkbox</option>
+                                    <option value="radio" {% if field.type == 'radio' %}selected{% endif %}>Radio Buttons</option>
+                                    <option value="file" {% if field.type == 'file' %}selected{% endif %}>File Upload</option>
+                                    <option value="hidden" {% if field.type == 'hidden' %}selected{% endif %}>Hidden</option>
+                                </select>
+                            </div>
+                            <div class="form-group field-label">
+                                <label>Label *</label>
+                                <input type="text" name="fields[{{ loop.index0 }}][label]" value="{{ field.label }}" required placeholder="User-facing label">
+                            </div>
+                            <div class="form-group field-required">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="fields[{{ loop.index0 }}][required]" value="true" {% if field.required %}checked{% endif %}>
+                                    Required
+                                </label>
+                            </div>
+                            <div class="form-group field-remove">
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeField(this)">Remove</button>
+                            </div>
+                            <div class="field-options" id="options-{{ loop.index0 }}">
+                                <div class="form-group">
+                                    <label>Options (one per line, for select/radio/checkbox)</label>
+                                    <textarea name="fields[{{ loop.index0 }}][options]" placeholder="Option 1&#10;Option 2&#10;Option 3">{% if field.options %}{{ field.options|join('\n') }}{% endif %}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <button type="button" class="btn btn-secondary add-field-btn" onclick="addField()">+ Add Field</button>
+            </div>
+            
+            <!-- Notifications -->
+            <div class="card">
+                <h2 class="card-title">Notifications</h2>
+                
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="email_enabled" value="true" {% if form and form.email_enabled %}checked{% endif %} onchange="toggleEmail(this)">
+                        Enable Email Notifications
+                    </label>
+                </div>
+                <div id="email-settings" style="display: {% if form and form.email_enabled %}block{% else %}none{% endif %}; margin-top: 16px; padding: 16px; background: #fafafa; border-radius: 6px;">
+                    <div class="form-group">
+                        <label for="email_to">To Email *</label>
+                        <input type="email" id="email_to" name="email_to" value="{{ form.email_to if form else '' }}" placeholder="notifications@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="email_subject">Subject *</label>
+                        <input type="text" id="email_subject" name="email_subject" value="{{ form.email_subject if form else 'New Form Submission' }}" placeholder="New Form Submission">
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-top: 24px;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="webhook_enabled" value="true" {% if form and form.webhook_enabled %}checked{% endif %} onchange="toggleWebhook(this)">
+                        Enable Webhook
+                    </label>
+                </div>
+                <div id="webhook-settings" style="display: {% if form and form.webhook_enabled %}block{% else %}none{% endif %}; margin-top: 16px; padding: 16px; background: #fafafa; border-radius: 6px;">
+                    <div class="form-group">
+                        <label for="webhook_url">Webhook URL *</label>
+                        <input type="text" id="webhook_url" name="webhook_url" value="{{ form.webhook_url if form else '' }}" placeholder="https://your-app.com/webhook/forms">
+                        <div class="help-text">Will receive POST with form data. HMAC signature in X-Forms-Builder-Signature header.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Spam Protection -->
+            <div class="card">
+                <h2 class="card-title">Spam Protection</h2>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="honeypot_enabled" value="true" {% if not form or form.honeypot_enabled %}checked{% endif %}>
+                        Enable Honeypot Field
+                    </label>
+                    <div class="help-text">Adds a hidden field that bots fill but humans don't see</div>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label for="honeypot_field_name">Honeypot Field Name</label>
+                    <input type="text" id="honeypot_field_name" name="honeypot_field_name" value="{{ form.honeypot_field_name if form else 'website' }}" placeholder="website">
+                    <div class="help-text">Name of the hidden field (default: 'website')</div>
+                </div>
+                <div class="form-group" style="margin-top: 12px;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="rate_limit_enabled" value="true" {% if not form or form.rate_limit_enabled %}checked{% endif %}>
+                        Enable Rate Limiting
+                    </label>
+                </div>
+                <div class="field-row" style="margin-top: 12px; display: {% if not form or form.rate_limit_enabled %}flex{% else %}none{% endif %};" id="rate-limit-fields">
+                    <div class="form-group field-name">
+                        <label>Max Requests</label>
+                        <input type="number" name="rate_limit_requests" value="{{ form.rate_limit_requests if form else 10 }}" min="1" max="1000">
+                    </div>
+                    <div class="form-group field-type">
+                        <label>Window (seconds)</label>
+                        <input type="number" name="rate_limit_window" value="{{ form.rate_limit_window if form else 60 }}" min="1" max="3600">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="form-actions">
+                {% if form %}
+                <a href="/forms/{{ form.id }}/submissions" class="btn btn-secondary">View Submissions</a>
+                {% endif %}
+                <a href="/forms" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">{% if form %}Save Changes{% else %}Create Form{% endif %}</button>
+            </div>
+        </form>
+        
+        {% if form %}
+        <!-- Embed Info -->
+        <div class="card embed-info">
+            <h4>Embed This Form</h4>
+            <p>Copy one of these snippets to embed the form on your website:</p>
+            <strong>JavaScript (recommended):</strong>
+            <code><div id="forms-builder-{{ form.id }}"></div>&#10;<script src="/embed/{{ form.id }}.js"></script></code>
+            <strong>Direct iframe:</strong>
+            <code><iframe src="/embed/{{ form.id }}" style="width: 100%; height: 500px; border: none;"></iframe></code>
+        </div>
+        {% endif %}
+    </div>
+    
+    <script>
+        let fieldIndex = {{ form.fields|length if form is defined else 0 }};
+        
+        function addField() {
+            const container = document.getElementById('fields-container');
+            const index = fieldIndex;
+            fieldIndex++;
+            
+            const div = document.createElement('div');
+            div.className = 'field-row';
+            div.dataset.fieldIndex = index;
+            div.innerHTML = `
+                <div class="form-group field-name">
+                    <label>Field Name *</label>
+                    <input type="text" name="fields[${index}][name]" required placeholder="e.g., email, name, message">
+                    <div class="help-text">Unique identifier, no spaces</div>
+                </div>
+                <div class="form-group field-type">
+                    <label>Type *</label>
+                    <select name="fields[${index}][type]" onchange="toggleOptions(this, ${index})" required>
+                        <option value="text">Text</option>
+                        <option value="email">Email</option>
+                        <option value="textarea">Textarea</option>
+                        <option value="select">Select (Dropdown)</option>
+                        <option value="checkbox">Checkbox</option>
+                        <option value="radio">Radio Buttons</option>
+                        <option value="file">File Upload</option>
+                        <option value="hidden">Hidden</option>
+                    </select>
+                </div>
+                <div class="form-group field-label">
+                    <label>Label *</label>
+                    <input type="text" name="fields[${index}][label]" required placeholder="User-facing label">
+                </div>
+                <div class="form-group field-required">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="fields[${index}][required]" value="true">
+                        Required
+                    </label>
+                </div>
+                <div class="form-group field-remove">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeField(this)">Remove</button>
+                </div>
+                <div class="field-options" id="options-${index}">
+                    <div class="form-group">
+                        <label>Options (one per line, for select/radio/checkbox)</label>
+                        <textarea name="fields[${index}][options]" placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            toggleOptions(div.querySelector('select'), index);
+        }
+        
+        function removeField(btn) {
+            const row = btn.closest('.field-row');
+            if (document.querySelectorAll('.field-row').length > 1) {
+                row.remove();
+            } else {
+                alert('At least one field is required');
+            }
+        }
+        
+        function toggleOptions(select, index) {
+            const optionsDiv = document.getElementById('options-' + index);
+            const type = select.value;
+            if (['select', 'radio', 'checkbox'].includes(type)) {
+                optionsDiv.classList.add('visible');
+            } else {
+                optionsDiv.classList.remove('visible');
+            }
+        }
+        
+        function toggleEmail(checkbox) {
+            document.getElementById('email-settings').style.display = checkbox.checked ? 'block' : 'none';
+        }
+        
+        function toggleWebhook(checkbox) {
+            document.getElementById('webhook-settings').style.display = checkbox.checked ? 'block' : 'none';
+        }
+        
+        // Initialize field options visibility
+        document.querySelectorAll('.field-row').forEach(row => {
+            const select = row.querySelector('select');
+            const index = row.dataset.fieldIndex;
+            if (select) toggleOptions(select, index);
+        });
+        
+        // Rate limiting toggle
+        document.querySelector('input[name="rate_limit_enabled"]').addEventListener('change', function() {
+            document.getElementById('rate-limit-fields').style.display = this.checked ? 'flex' : 'none';
+        });
+    </script>
+</body>
+</html>

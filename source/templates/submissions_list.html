@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submissions - {{ form.name }} - Forms Builder</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+        h1 { margin: 0; color: #333; font-size: 28px; }
+        .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-secondary { background: white; color: #333; border: 1px solid #ddd; }
+        .btn-secondary:hover { background: #f5f5f5; }
+        
+        .table-container { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 16px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background: #fafafa; font-weight: 600; color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: #fafafa; }
+        
+        .submission-data { font-family: 'Monaco', 'Menlo', monospace; font-size: 12px; max-width: 400px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; background: #f8f9fa; padding: 8px; border-radius: 4px; }
+        .submission-meta { color: #888; font-size: 13px; }
+        .submission-ip { font-family: monospace; }
+        
+        .empty-state { text-align: center; padding: 60px 20px; color: #888; }
+        .empty-state h3 { margin: 16px 0 8px; color: #555; }
+        
+        .form-info { background: #f0f4ff; border: 1px solid #d6e4ff; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+        .form-info h2 { margin: 0 0 8px; color: #333; font-size: 20px; }
+        .form-info p { margin: 0; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-info">
+            <h2>{{ form.name }}</h2>
+            <p>{{ form.description or 'No description' }} • {{ total }} submission{{ 's' if total != 1 else '' }}</p>
+        </div>
+        
+        <div class="header">
+            <h1>Submissions</h1>
+            <a href="/forms/{{ form.id }}/edit" class="btn btn-secondary">← Edit Form</a>
+        </div>
+        
+        <div class="table-container">
+            {% if submissions %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Submitted</th>
+                        <th>Data</th>
+                        <th>IP Address</th>
+                        <th>User Agent</th>
+                        <th>Honeypot</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for submission in submissions %}
+                    <tr>
+                        <td>{{ submission.submitted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td><div class="submission-data">{{ submission.data|tojson(indent=2) }}</div></td>
+                        <td class="submission-meta submission-ip">{{ submission.client_ip or 'Unknown' }}</td>
+                        <td class="submission-meta" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ submission.user_agent or 'Unknown' }}</td>
+                        <td>
+                            {% if submission.honeypot_triggered %}
+                                <span style="color: #dc2626; font-weight: 600;">Triggered</span>
+                            {% else %}
+                                <span style="color: #2e7d32;">Clean</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <h3>No submissions yet</h3>
+                <p>Submissions will appear here when someone fills out your form.</p>
+                <a href="/embed/{{ form.id }}" class="btn btn-primary" style="margin-top: 16px; display: inline-block;" target="_blank">Preview Form</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
